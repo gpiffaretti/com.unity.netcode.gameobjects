@@ -1540,6 +1540,12 @@ namespace Unity.Netcode
             }
         }
 
+        public void ForceProcessSendQueues()
+        {
+            Debug.Log("Force process send queues");
+            MessagingSystem.ProcessSendQueues();
+        }
+
         private void ProcessPendingApprovals()
         {
             List<ulong> senders = null;
