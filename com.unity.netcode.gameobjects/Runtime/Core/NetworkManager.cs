@@ -1543,7 +1543,9 @@ namespace Unity.Netcode
         public void ForceProcessSendQueues()
         {
             Debug.Log("Force process send queues");
+            Transports.UTP.UnityTransport.flushSync = true;
             MessagingSystem.ProcessSendQueues();
+            Transports.UTP.UnityTransport.flushSync = false;
         }
 
         private void ProcessPendingApprovals()

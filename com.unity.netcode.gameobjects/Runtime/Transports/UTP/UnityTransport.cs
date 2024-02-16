@@ -1182,6 +1182,8 @@ namespace Unity.Netcode.Transports.UTP
             return NetcodeNetworkEvent.Nothing;
         }
 
+
+        public static bool flushSync = false;
         /// <summary>
         /// Send a payload to the specified clientId, data and networkDelivery.
         /// </summary>
@@ -1253,13 +1255,24 @@ namespace Unity.Netcode.Transports.UTP
                     // If the message is sent unreliably, we can always just flush everything out
                     // to make space in the send queue. This is an expensive operation, but a user
                     // would need to send A LOT of unreliable traffic in one update to get here.
-
+                    
                     m_Driver.ScheduleFlushSend(default).Complete();
                     SendBatchedMessages(sendTarget, queue);
 
                     // Don't check for failure. If it still doesn't work, there's nothing we can do
                     // at this point and the message is lost (it was sent unreliable anyway).
                     queue.PushMessage(payload);
+                }
+            }
+            else
+            {
+                // this is a patch to send messages synchronously and on demand when the app is about to be minimized
+                if(flushSync)
+                {
+                    Debug.Log("Flush send");
+                    m_Driver.ScheduleFlushSend(default).Complete();
+                    SendBatchedMessages(sendTarget, queue);
+                    m_Driver.ScheduleUpdate().Complete();
                 }
             }
         }
